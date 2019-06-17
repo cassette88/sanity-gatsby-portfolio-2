@@ -1,9 +1,12 @@
 import React from 'react'
 import {graphql} from 'gatsby'
+import {imageUrlFor} from '../lib/image-url'
+
 import {
   mapEdgesToNodes,
   filterOutDocsWithoutSlugs,
-  filterOutDocsPublishedInTheFuture
+  filterOutDocsPublishedInTheFuture,
+  buildImageObj
 } from '../lib/helpers'
 import Container from '../components/container'
 import GraphQLErrorList from '../components/graphql-error-list'
@@ -56,7 +59,22 @@ export const query = graphql`
         }
       }
     }
+    allSanityProduct {
+      edges {
+        node {
+          name
+          price
+          image {
+            _type
+            asset {
+              _type
+              _id
+          }
+        }
+      }
+    }
   }
+}
 `
 
 const IndexPage = props => {
@@ -76,6 +94,19 @@ const IndexPage = props => {
       .filter(filterOutDocsWithoutSlugs)
       .filter(filterOutDocsPublishedInTheFuture)
     : []
+  //const productNodes = (data || {}).products
+  function buildImageObj (source) {
+    const imageObj = {
+      asset: {_ref: source.asset._ref || source.asset._id}
+    }
+  
+    if (source.crop) imageObj.crop = source.crop
+    if (source.hotspot) imageObj.hotspot = source.hotspot
+  
+    return imageObj
+  }
+  
+
 
   if (!site) {
     throw new Error(
@@ -94,7 +125,20 @@ const IndexPage = props => {
             nodes={projectNodes}
             browseMoreHref='/archive/'
           />
-        )}
+        )}    
+        <ol>
+          {data.allSanityProduct.edges.map((edge) => {
+            return(
+              <li>
+                <h2>{edge.node.name}</h2>
+                <p>{edge.node.price}</p>
+                {/* <p>{edge.node.image}</p> */}
+                {/* <img src={imageUrlFor(buildImageObj(edge.node.image.asset._ref)).url()} /> */}
+              <img src={imageUrlFor(edge.node.image).url()} />
+              </li>
+            )
+          })}
+          </ol> 
       </Container>
     </Layout>
   )

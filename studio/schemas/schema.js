@@ -9,7 +9,7 @@ import category from './documents/category'
 import person from './documents/person'
 import project from './documents/project'
 import siteSettings from './documents/siteSettings'
-import product from './products/index'
+import products from './products/products'
 
 // Object types
 import bioPortableText from './objects/bioPortableText'
@@ -38,6 +38,6 @@ export default createSchema({
     person,
     project,
     siteSettings,
-    product
+    products
   ])
 })
